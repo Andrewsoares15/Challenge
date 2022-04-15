@@ -13,21 +13,18 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Objects;
 @Component
 public class CsvHelper {
-
-    private static String TYPE = "text/csv";
 
     private String[] HEADERs = {"bancoOrigem", "agenciaOrigem", "contaOrigem", "bancoDestino", "agenciaDestino",
             "contaDestino", "valor", "data"};
 
-    public static boolean hasCSVFormat(MultipartFile file) throws IOException {
-        if (!TYPE.equals(file.getContentType())) {
-            URLConnection.guessContentTypeFromName(file.toString());
-            return false;
+    public static boolean hasCSVFormat(MultipartFile file) {
+        if (Objects.equals(file.getContentType(), "text/csv")) {
+            return true;
         }
-        return true;
+        return false;
     }
     public  List<Transaction> csvConvert(MultipartFile is) throws IOException {
         List<Transaction> transacoes = new ArrayList<>();

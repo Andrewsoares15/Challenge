@@ -29,19 +29,17 @@ public class TransacaoService {
     @Autowired
     private ImportRepository importacaoRepository;
     @Autowired
-    public CsvHelper csvHelper;
+    private CsvHelper csvHelper;
 
     public void SaveTransaction(MultipartFile file) throws IOException {
         if(file.getSize() == 0) throw new RuntimeException("Arquivo vazio!");
 
-        if(!CsvHelper.hasCSVFormat(file)) throw new RuntimeException("Arquivo Inválido");
+        if(!CsvHelper.hasCSVFormat(file)) throw new RuntimeException("Arquivo Inválido!");
 
         var transactions = csvHelper.csvConvert(file);
         saveImport(transactions.get(0).getData().toLocalDate());
         var saveTransactions = transactions.stream()
                 .map(transaction -> transacaoRepository.save(transaction)).collect(Collectors.toList());
-
-
     }
 
     public void saveImport(LocalDate dataTransactions){

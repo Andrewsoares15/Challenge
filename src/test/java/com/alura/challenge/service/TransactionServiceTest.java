@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class TransactionServiceTest {
 
     private TransacaoService transacaoServiceTest;
-
     @Mock
     private CsvHelper cvsHelper;
     @Mock
@@ -40,12 +39,11 @@ class TransactionServiceTest {
     void setUp(){
         transacaoServiceTest = new TransacaoService(transacaoRepositoryTest,importRepositoryTest, cvsHelper);
     }
-
     @Test
     void DeveriaSalvarTransaction() throws IOException {
         var lista = transacoes();
         //dado
-        MultipartFile multipartFile = mockMultipartFile();
+        MultipartFile multipartFile = mockMultipartFile("src/test/resources/transacoes.csv");
         //quando
         when(cvsHelper.csvConvert(multipartFile)).thenReturn(lista);
        transacaoServiceTest.SaveTransaction(multipartFile);
@@ -54,11 +52,20 @@ class TransactionServiceTest {
         verify(transacaoRepositoryTest).save(lista.get(1));
     }
     @Test()
-
     void DeveriaRetornarExceptionAoEnviarArquivoVazio() throws IOException {
-        MultipartFile multipartFile = mockMultipartFile();
+        MultipartFile multipartFile = mockMultipartFile("src/test/resources/transacoesvazio.csv");
 
-       transacaoServiceTest.SaveTransaction(multipartFile);
+        var runtimeException = assertThrows(RuntimeException.class, () -> transacaoServiceTest.SaveTransaction(multipartFile));
+
+        assertTrue(runtimeException.getMessage().contains("Arquivo vazio!"));
+    }
+    @Test
+    void DeveriaRetornarExceptionAoEnviarArquivoInvalido() throws IOException {
+        MultipartFile multipartFile = mockMultipartFile("src/test/resources/teste.html");
+
+        var runtimeException = assertThrows(RuntimeException.class, () -> transacaoServiceTest.SaveTransaction(multipartFile));
+
+        assertTrue(runtimeException.getMessage().contains("Arquivo Inválido!"));
     }
     @Test
     @Disabled
@@ -72,10 +79,10 @@ class TransactionServiceTest {
         // entao
         verify(importRepositoryTest).findAllByOrderByDateTransactionsDesc();
     }
-    private MultipartFile mockMultipartFile() throws IOException {
-        File file = new File("src/test/resources/transacoes.csv");
+    private MultipartFile mockMultipartFile(String path) throws IOException {
+        File file = new File(path);
         FileInputStream fileInputStream = new FileInputStream(file);
-        return new MockMultipartFile("file", file.getName(), "text/csv", fileInputStream);
+        return new MockMultipartFile("file", file.getName(), "text/" +file.getName().split("[.]")[1], fileInputStream);
     }
     private List<Transaction> transacoes(){
             var transacao = Transaction.builder().bancoOrigem("BANCO DO BRASIL")
