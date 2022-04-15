@@ -1,6 +1,5 @@
 package com.alura.challenge.service;
 
-import com.alura.challenge.domain.DTOs.TransactionResponse;
 import com.alura.challenge.domain.Transaction;
 import com.alura.challenge.helper.CsvHelper;
 import com.alura.challenge.repository.ImportRepository;
@@ -11,11 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.util.Assert;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,37 +28,37 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class TransactionServiceTest {
 
     private TransacaoService transacaoServiceTest;
+
     @Mock
     private CsvHelper cvsHelper;
     @Mock
     private TransacaoRepository transacaoRepositoryTest;
     @Mock
     private ImportRepository importRepositoryTest;
+
     @BeforeEach // antes de cada
     void setUp(){
-        transacaoServiceTest = new TransacaoService(importRepositoryTest, cvsHelper);
+        transacaoServiceTest = new TransacaoService(transacaoRepositoryTest,importRepositoryTest, cvsHelper);
     }
+
     @Test
     void DeveriaSalvarTransaction() throws IOException {
         var lista = transacoes();
         //dado
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream =  ClassLoader.getSystemClassLoader().getResourceAsStream("transacoes.csv");
-       // InputStream inputStream = this.getClass().getResourceAsStream("/transacoes.csv");
-
+        MultipartFile multipartFile = mockMultipartFile();
         //quando
-//        when(cvsHelper.csvConvert(inputStream)).thenReturn(lista);
-       transacaoServiceTest.SaveTransaction((MultipartFile) inputStream);
+        when(cvsHelper.csvConvert(multipartFile)).thenReturn(lista);
+       transacaoServiceTest.SaveTransaction(multipartFile);
         //entao
         verify(transacaoRepositoryTest).save(lista.get(0));
         verify(transacaoRepositoryTest).save(lista.get(1));
-        //var transactionResponse = lista.get(0);
     }
     @Test()
-    void DeveriaRetornarExceptionAoEnviarArquivoVazio() throws IOException {
-        MultipartFile inputStream = (MultipartFile) this.getClass().getResourceAsStream("transacoes.csv");
 
-       transacaoServiceTest.SaveTransaction(inputStream);
+    void DeveriaRetornarExceptionAoEnviarArquivoVazio() throws IOException {
+        MultipartFile multipartFile = mockMultipartFile();
+
+       transacaoServiceTest.SaveTransaction(multipartFile);
     }
     @Test
     @Disabled
@@ -74,25 +72,31 @@ class TransactionServiceTest {
         // entao
         verify(importRepositoryTest).findAllByOrderByDateTransactionsDesc();
     }
+    private MultipartFile mockMultipartFile() throws IOException {
+        File file = new File("src/test/resources/transacoes.csv");
+        FileInputStream fileInputStream = new FileInputStream(file);
+        return new MockMultipartFile("file", file.getName(), "text/csv", fileInputStream);
+    }
     private List<Transaction> transacoes(){
             var transacao = Transaction.builder().bancoOrigem("BANCO DO BRASIL")
-            .agenciaOrigem(1)
+            .agenciaOrigem(0001)
             .contaOrigem("00001-1")
             .bancoDestino("BANCO BRADESCO")
-            .agenciaDestino(1)
+            .agenciaDestino(0001)
             .contaDestino("00001-1")
             .valor(8000.00)
-            .data(LocalDateTime.now())
+            .data(LocalDateTime.parse("2022-01-01T07:30:00"))
             .build();
         var transacao2 = Transaction.builder().bancoOrigem("BANCO SANTANDER")
-                .agenciaOrigem(1)
+                .agenciaOrigem(0001)
                 .contaOrigem("00001-1")
                 .bancoDestino("BANCO BRADESCO")
-                .agenciaDestino(1)
+                .agenciaDestino(0001)
                 .contaDestino("00001-1")
                 .valor(210.00)
-                .data(LocalDateTime.now())
+                .data(LocalDateTime.parse("2022-01-01T08:12:00"))
                 .build();
+
         List<Transaction> lista = new ArrayList<>();
         lista.add(transacao);
         lista.add(transacao2);

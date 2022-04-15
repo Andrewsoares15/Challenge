@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.net.URLConnection;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,16 +22,17 @@ public class CsvHelper {
     private String[] HEADERs = {"bancoOrigem", "agenciaOrigem", "contaOrigem", "bancoDestino", "agenciaDestino",
             "contaDestino", "valor", "data"};
 
-    public static boolean hasCSVFormat(MultipartFile file) {
+    public static boolean hasCSVFormat(MultipartFile file) throws IOException {
         if (!TYPE.equals(file.getContentType())) {
+            URLConnection.guessContentTypeFromName(file.toString());
             return false;
         }
         return true;
     }
-    public  List<Transaction> csvConvert(InputStream is) throws IOException {
+    public  List<Transaction> csvConvert(MultipartFile is) throws IOException {
         List<Transaction> transacoes = new ArrayList<>();
 
-        try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(is.getInputStream(), "UTF-8"));
              CSVParser csvParser = new CSVParser(fileReader,
                      CSVFormat.EXCEL.withHeader(HEADERs))) {
 

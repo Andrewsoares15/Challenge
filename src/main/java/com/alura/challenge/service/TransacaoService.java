@@ -9,17 +9,21 @@ import com.alura.challenge.repository.TransacaoRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class TransacaoService {
+
     @Autowired
     private TransacaoRepository transacaoRepository;
     @Autowired
@@ -27,22 +31,16 @@ public class TransacaoService {
     @Autowired
     public CsvHelper csvHelper;
 
-    public TransacaoService(ImportRepository importRepository, CsvHelper cvsHelper) {
-        this.importacaoRepository = importRepository;
-        this.csvHelper = cvsHelper;
-    }
-
-    public List<TransactionResponse> SaveTransaction(MultipartFile file) throws IOException {
-       // if(file.isEmpty()) throw new RuntimeException("Arquivo vazio!");
+    public void SaveTransaction(MultipartFile file) throws IOException {
+        if(file.getSize() == 0) throw new RuntimeException("Arquivo vazio!");
 
         if(!CsvHelper.hasCSVFormat(file)) throw new RuntimeException("Arquivo Inválido");
 
-        var transactions = csvHelper.csvConvert(file.getInputStream());
+        var transactions = csvHelper.csvConvert(file);
         saveImport(transactions.get(0).getData().toLocalDate());
-        var SaveTransactions = transactions.stream()
-                .map(transaction -> transacaoRepository.save(transaction));
-        return SaveTransactions.map(
-                saveTransaction -> new TransactionResponse(saveTransaction)).collect(Collectors.toList());
+        var saveTransactions = transactions.stream()
+                .map(transaction -> transacaoRepository.save(transaction)).collect(Collectors.toList());
+
 
     }
 

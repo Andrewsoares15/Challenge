@@ -18,10 +18,10 @@ public class TransacaoController {
     public TransacaoService transacaoService;
 
     @PostMapping(value = "/insertFile" )
-    public ResponseEntity<List<TransactionResponse>> postFile(@RequestParam("file") MultipartFile file) throws IOException {
-        var transactions= transacaoService.SaveTransaction(file);
+    public ResponseEntity<List<TransactionResponse>> postFile(@RequestPart("file") MultipartFile file) throws IOException {
+       transacaoService.SaveTransaction(file);
 
-        return ResponseEntity.ok(transactions);
+        return ResponseEntity.created(null).build();
     }
 
     @GetMapping("/getImports")
