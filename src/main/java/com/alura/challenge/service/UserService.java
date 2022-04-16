@@ -2,6 +2,7 @@ package com.alura.challenge.service;
 
 import com.alura.challenge.domain.DTOs.UserCreateRequest;
 import com.alura.challenge.domain.DTOs.UserResponse;
+import com.alura.challenge.domain.entity.Email;
 import com.alura.challenge.domain.entity.User;
 import com.alura.challenge.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -16,6 +18,8 @@ public class UserService {
 
     @Autowired
     private UserRepository repository;
+    @Autowired
+    private EmailService emailService;
 
     public UserResponse createUser(UserCreateRequest userCreateRequest) {
         String password = createPassword();
@@ -23,21 +27,27 @@ public class UserService {
         var user = User.builder()
                 .name(userCreateRequest.getNome())
                 .email(userCreateRequest.getEmail())
-                .password(new BCryptPasswordEncoder().encode(password))
+                .password(password)
                 .build();
         enviarEmail(user);
+        user.setPassword(new BCryptPasswordEncoder().encode(password));
         var save = repository.save(user);
 
         return new UserResponse(save);
     }
 
     private void enviarEmail(User user) {
-        System.out.println("Enviando email para: " + user.getEmail());
-        System.out.println("Senha: " + user.getPassword());
-        System.out.println("Nome: " + user.getName());
-        System.out.println();
+        var email = Email.builder()
+                .ownerRef(user.getName())
+                .emailFrom("andrewsoares347@gmail.com")
+                .emailTo(user.getEmail())
+                .subject("Bem vindo ao Challenge")
+                        .text("Olá " + user.getName() + ", seja bem vindo ao Challenge. Sua senha é: " + user.getPassword())
+                .build();
+        emailService.sendEmail(email);
+
     }
     private String createPassword() {
-        return  UUID.randomUUID().toString();
+        return  UUID.randomUUID().toString().substring(0, 6);
     }
 }

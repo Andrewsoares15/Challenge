@@ -9,13 +9,15 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 @EnableWebSecurity
 @Configuration
-@Profile("dev")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.headers().frameOptions().disable();
         http.csrf().disable();
-        http.authorizeRequests().anyRequest().permitAll();
+        http.authorizeRequests().antMatchers(HttpMethod.POST, "/users").permitAll()
+                .antMatchers("/h2-console/**/**").permitAll()
+                .antMatchers("/swagger-ui.html/**").permitAll();
     }
 
 }

@@ -20,6 +20,7 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.apache.commons:commons-csv:1.9.0'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation "io.springfox:springfox-boot-starter:3.0.0"
