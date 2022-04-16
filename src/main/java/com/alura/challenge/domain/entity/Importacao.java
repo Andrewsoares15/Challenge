@@ -1,4 +1,4 @@
-package com.alura.challenge.domain;
+package com.alura.challenge.domain.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -16,24 +17,12 @@ import java.time.LocalDateTime;
 @Entity
 @Builder
 @AllArgsConstructor
-public class Transaction {
+public class Importacao {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String bancoOrigem;
+    private LocalDateTime dateImport;
 
-    private Integer agenciaOrigem;
-
-    private String contaOrigem;
-
-    private String bancoDestino;
-
-    private Integer agenciaDestino;
-
-    private String contaDestino;
-
-    private Double valor;
-
-    private LocalDateTime data;
+    private LocalDate dateTransactions;
 }

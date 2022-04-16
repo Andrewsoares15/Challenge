@@ -1,6 +1,6 @@
 package com.alura.challenge.service;
 
-import com.alura.challenge.domain.Transaction;
+import com.alura.challenge.domain.entity.Transaction;
 import com.alura.challenge.helper.CsvHelper;
 import com.alura.challenge.repository.ImportRepository;
 import com.alura.challenge.repository.TransacaoRepository;
@@ -14,7 +14,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

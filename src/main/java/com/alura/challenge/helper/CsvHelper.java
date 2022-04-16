@@ -1,6 +1,6 @@
 package com.alura.challenge.helper;
 
-import com.alura.challenge.domain.Transaction;
+import com.alura.challenge.domain.entity.Transaction;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.net.URLConnection;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

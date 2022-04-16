@@ -2,7 +2,7 @@ package com.alura.challenge.service;
 
 import com.alura.challenge.domain.DTOs.ImportationResponse;
 import com.alura.challenge.domain.DTOs.TransactionResponse;
-import com.alura.challenge.domain.Importacao;
+import com.alura.challenge.domain.entity.Importacao;
 import com.alura.challenge.helper.CsvHelper;
 import com.alura.challenge.repository.ImportRepository;
 import com.alura.challenge.repository.TransacaoRepository;

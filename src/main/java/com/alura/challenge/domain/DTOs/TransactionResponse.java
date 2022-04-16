@@ -1,6 +1,6 @@
 package com.alura.challenge.domain.DTOs;
 
-import com.alura.challenge.domain.Transaction;
+import com.alura.challenge.domain.entity.Transaction;
 import lombok.Data;
 
 import java.time.LocalDateTime;
