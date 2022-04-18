@@ -7,9 +7,9 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class UserCreateRequest {
 
-    @NotBlank
+    @NotBlank(message = "Nome é obrigatório")
     private String nome;
-    @NotBlank
+    @NotBlank(message = "Email é obrigatório")
     private String email;
 
 

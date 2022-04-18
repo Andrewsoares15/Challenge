@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class EmailDto {
 
-    @NotBlank
+    @NotBlank()
     private String ownerRef;
     @NotBlank
     @Email

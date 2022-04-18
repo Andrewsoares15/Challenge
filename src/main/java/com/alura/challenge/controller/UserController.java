@@ -1,6 +1,7 @@
 package com.alura.challenge.controller;
 
 import com.alura.challenge.domain.DTOs.UserCreateRequest;
+import com.alura.challenge.domain.entity.User;
 import com.alura.challenge.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/users")
-    public ResponseEntity createUser(@RequestBody UserCreateRequest userCreateRequest) {
+    public ResponseEntity<User> createUser(@RequestBody UserCreateRequest userCreateRequest) {
         var user = userService.createUser(userCreateRequest);
         URI location = URI.create("/users/" + user.getEmail());
         return ResponseEntity.created(location).build();
