@@ -10,8 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -55,6 +57,11 @@ public class UserService {
     }
     private String createPassword() {
         return  UUID.randomUUID().toString().substring(0, 6);
+    }
+
+    public List<UserResponse> listUser() {
+        List<User> userList = repository.findAllIgnoreAdmin();
+        return userList.stream().map(user -> new UserResponse(user)).collect(Collectors.toList());
     }
 }
 
