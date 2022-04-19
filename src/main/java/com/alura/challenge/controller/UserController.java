@@ -6,10 +6,7 @@ import com.alura.challenge.domain.entity.User;
 import com.alura.challenge.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
@@ -30,5 +27,17 @@ public class UserController {
     public ResponseEntity<List<UserResponse>> listUser(){
         var userResponses = userService.listUser();
         return ResponseEntity.ok(userResponses);
+    }
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<UserResponse> updateUser(@RequestBody UserCreateRequest updateRequest, @RequestParam Long id){
+        UserResponse user = userService.updateUser(id, updateRequest);
+        URI location = URI.create("/users/" + user.getEmail());
+        return ResponseEntity.created(location).build();
+    }
+    @DeleteMapping("/users/{id}/{idExcluido}")
+    public ResponseEntity deleteUser(@RequestParam Long id, @RequestParam Long idExcluido){
+        userService.deleteUser(id, idExcluido);
+        return ResponseEntity.ok(id);
     }
 }
