@@ -7,6 +7,7 @@ import com.alura.challenge.domain.entity.User;
 import com.alura.challenge.exception.UserException;
 import com.alura.challenge.exception.UserNotFoundException;
 import com.alura.challenge.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class UserService {
 
     @Autowired
@@ -23,7 +25,7 @@ public class UserService {
     @Autowired
     private EmailService emailService;
 
-    public UserResponse createUser(UserCreateRequest userCreateRequest) {
+    public void createUser(UserCreateRequest userCreateRequest) {
         String password = createPassword();
 
         User byEmail = repository.findByEmail(userCreateRequest.getEmail());
@@ -40,8 +42,6 @@ public class UserService {
         enviarEmail(user);
         user.setPassword(new BCryptPasswordEncoder().encode(password));
         var save = repository.save(user);
-
-        return new UserResponse(save);
     }
 
     private void enviarEmail(User user) {

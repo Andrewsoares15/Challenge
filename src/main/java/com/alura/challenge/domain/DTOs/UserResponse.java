@@ -1,9 +1,11 @@
 package com.alura.challenge.domain.DTOs;
 
 import com.alura.challenge.domain.entity.User;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class UserResponse {
 
     private String name;
