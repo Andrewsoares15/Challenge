@@ -13,7 +13,9 @@ public class UserResponse {
 
 
     public UserResponse(User save) {
-        this.name = save.getName();
-        this.email = save.getEmail();
+        if (save != null) {
+            this.name = save.getName();
+            this.email = save.getEmail();
+        }
     }
 }

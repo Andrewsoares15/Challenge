@@ -3,6 +3,7 @@ package com.alura.challenge.service;
 import com.alura.challenge.domain.DTOs.UserCreateRequest;
 import com.alura.challenge.domain.DTOs.UserResponse;
 import com.alura.challenge.domain.entity.User;
+import com.alura.challenge.exception.UserException;
 import com.alura.challenge.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.mapping.Any;
@@ -26,6 +27,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -48,36 +50,50 @@ class UserServiceTest {
     }
     @Test
     void createUser() throws Exception {
-        //dado
-//        User user = new User(null, "andrew", "andrewfialho@unigranrio.br", "test");
-//        UserResponse userResponse = new UserResponse("andrew", "andrewfialho@unigranrio.br");
+
         UserCreateRequest userCreateRequest = new UserCreateRequest("andrew", "andrewfialho@unigranrio.br");
-        //quando
         service.createUser(userCreateRequest);
 
         verify(userRepository).save(Mockito.any());
+        verify(emailService).sendEmail(Mockito.any());
 
     }
-    public static String asJsonString(final Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    @Test
+    void DeveriaRetornarExceptionAoTentarCriarUserComEmailJaUtilizado() throws Exception {
+
+        UserCreateRequest userCreateRequest = new UserCreateRequest("andrew", "andrewfialho@unigranrio.br");
+
+        when(userRepository.findByEmail(userCreateRequest.getEmail())).thenReturn(new User());
+
+        var userException = assertThrows(UserException.class, () -> service.createUser(userCreateRequest));
+
+        assertEquals("Email já cadastrado", userException.getMessage());
     }
     @Test
     void listUser() {
+
         List<UserResponse> users = new ArrayList<>();
         UserResponse user = new UserResponse("asdasdads", "asdasd");
+
         lenient().when(restTemplate.getForEntity("http://localhost:8080/users", UserResponse.class))
                 .thenReturn(new ResponseEntity(users, HttpStatus.OK));
+
         List<UserResponse> userResponses = service.listUser();
         Assertions.assertEquals(users, userResponses);
     }
 
     @Test
-    @Disabled
     void updateUser() {
+        UserCreateRequest userCreateRequest = new UserCreateRequest("andrewUpdate", "andrewfialho@unigranrio.br");
+
+        User user = new User(2l, "andrew", "andrewfialho@unigranrio.br", "test");
+
+        when(userRepository.findByIdIgnoreAdmin(2l)).thenReturn(Optional.of(user));
+
+        service.updateUser(2l, userCreateRequest);
+
+        verify(userRepository).findByIdIgnoreAdmin(2l);
+        assertTrue(user.getName().equals("andrewUpdate"));
     }
 
     @Test
