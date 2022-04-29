@@ -1,5 +1,6 @@
 package com.alura.challenge.service;
 
+import com.alura.challenge.domain.DTOs.AutenticaRequest;
 import com.alura.challenge.domain.DTOs.UserCreateRequest;
 import com.alura.challenge.domain.DTOs.UserResponse;
 import com.alura.challenge.domain.entity.Email;
@@ -9,10 +10,12 @@ import com.alura.challenge.exception.UserNotFoundException;
 import com.alura.challenge.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -24,15 +27,15 @@ public class UserService {
     private UserRepository repository;
     @Autowired
     private EmailService emailService;
-
+    @Autowired
+    private AutenticacaoService autenticacaoService;
     public void createUser(UserCreateRequest userCreateRequest) {
         String password = createPassword();
 
-        User byEmail = repository.findByEmail(userCreateRequest.getEmail());
-        if(byEmail != null){
-            throw new UserException("Email já cadastrado");
+        Optional<User> byEmail = repository.findByEmail(userCreateRequest.getEmail());
+        if(!byEmail.isEmpty()){
+            throw new UserException("Email já cadastrado!");
         }
-
         var user = User.builder()
                 .name(userCreateRequest.getNome())
                 .email(userCreateRequest.getEmail())
@@ -76,14 +79,18 @@ public class UserService {
 
     }
 
-    public void deleteUser(Long id, Long idExcluido) {
-        var byEmail = repository.findByIdIgnoreAdmin(id).orElseThrow(() -> new UserNotFoundException("User notfound!"));
+    public void deleteUser(Long id) {
+        User userLogado = autenticacaoService.getUserLogado();
 
-        var userDelete = repository.findByIdIgnoreAdmin(idExcluido).orElseThrow(() -> new UserNotFoundException("User notfound!"));
+        var userDelete = repository.findByIdIgnoreAdmin(id).orElseThrow(() -> new UserNotFoundException("User notfound!"));
 
-        if(byEmail.getId() == userDelete.getId()) throw new UserException("Você não pode se deletar!");
+        if(userLogado.getId() == userDelete.getId()) throw new UserException("Você não pode se deletar!");
 
-        repository.delete(byEmail);
+        repository.delete(userDelete);
+    }
+
+    public UsernamePasswordAuthenticationToken autentica(AutenticaRequest request) {
+        return new UsernamePasswordAuthenticationToken(request.getEmail(), request.getSenha());
     }
 }
 

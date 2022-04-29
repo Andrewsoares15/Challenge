@@ -43,10 +43,11 @@ class UserServiceTest {
 
     @Mock
     private EmailService emailService;
-
+    @Mock
+    private AutenticacaoService autenticacaoService;
     @BeforeEach
     void setParams(){
-        service = new UserService(userRepository, emailService);
+        service = new UserService(userRepository, emailService, autenticacaoService);
     }
     @Test
     void createUser() throws Exception {
@@ -63,7 +64,7 @@ class UserServiceTest {
 
         UserCreateRequest userCreateRequest = new UserCreateRequest("andrew", "andrewfialho@unigranrio.br");
 
-        when(userRepository.findByEmail(userCreateRequest.getEmail())).thenReturn(new User());
+        when(userRepository.findByEmail(userCreateRequest.getEmail())).thenReturn(Optional.of(new User()));
 
         var userException = assertThrows(UserException.class, () -> service.createUser(userCreateRequest));
 

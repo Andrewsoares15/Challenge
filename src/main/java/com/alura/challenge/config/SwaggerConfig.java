@@ -27,7 +27,7 @@ public class SwaggerConfig {
     private ApiInfo apiInfo() {
         return new ApiInfo(
                 "Desafio do Feijão",
-                "Universidade Iteris - Spring Boot -\n Desenvolvido pelo Grupo 20. Composto por Andrew, Fernado e Riann",
+                "Transacoes financeiras",
                 "1.0.0",
                 "Disponível para estudos",
                 new Contact("Universidade Iteris", "https://iteris1.sharepoint.com/sites/universidade", "organizacao.td@iteris.com.br"),

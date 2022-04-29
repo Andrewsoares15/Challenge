@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    User findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
     @Query(value = "SELECT * FROM USER WHERE USER.email != 'admin@email.com.br'", nativeQuery = true)
     List<User> findAllIgnoreAdmin();
