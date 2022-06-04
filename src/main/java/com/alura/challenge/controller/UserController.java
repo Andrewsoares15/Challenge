@@ -35,9 +35,10 @@ public class UserController {
         URI location = URI.create("/users/" + user.getEmail());
         return ResponseEntity.created(location).build();
     }
+
     @DeleteMapping("/users/{id}")
-    public ResponseEntity deleteUser(@RequestParam Long id){
+    public ResponseEntity<?> deleteUser(@PathVariable Long id){
         userService.deleteUser(id);
-        return ResponseEntity.ok(id);
+        return ResponseEntity.ok().build();
     }
 }

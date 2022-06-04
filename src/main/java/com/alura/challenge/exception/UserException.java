@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class UserException extends RuntimeException {
 
     public UserException(String message) {
-        super (message);
+        super(message);
     }
 }

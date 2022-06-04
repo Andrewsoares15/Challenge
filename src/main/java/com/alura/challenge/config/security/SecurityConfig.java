@@ -2,11 +2,11 @@ package com.alura.challenge.config.security;
 
 import com.alura.challenge.repository.UserRepository;
 import com.alura.challenge.service.AutenticacaoService;
+import com.alura.challenge.service.TokenService;
 import com.alura.challenge.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -26,6 +26,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserService userService;
     @Autowired
+    private TokenService tokenService;
+    @Autowired
     private UserRepository repository;
 
     @Override
@@ -42,17 +44,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override // config de autorizacao
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/h2-console/**/**").permitAll()
                 .antMatchers("/swagger-ui/**/**/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/auth").permitAll()
                 .antMatchers(HttpMethod.POST, "/users").permitAll()
                 .antMatchers(HttpMethod.GET, "/users").permitAll()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .csrf().disable();
-//                .and().headers().frameOptions().sameOrigin()
-//                .and().addFilterBefore(new AutenticacaoViaTokenFilter(userService, repository), UsernamePasswordAuthenticationFilter.class); //
+                .anyRequest().authenticated()
+                .and().csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().headers().frameOptions().sameOrigin()
+                .and().addFilterBefore(new AutenticacaoViaTokenFilter(tokenService, repository), UsernamePasswordAuthenticationFilter.class); //
     }
     @Override // config de recursos estaticos(js, imagens, etc.)
     public void configure(WebSecurity web) throws Exception {
